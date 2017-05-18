@@ -38,13 +38,14 @@
    `oadm policy add-scc-to-user privileged -z default`
 16. Copy the [gluster-topology.json](./gluster-topology.json) file to your host:  
    `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-topology.json > /root/gluster-topology.json`
-17. Deploy your CNS magic:  
+17. Update the gluster-topology.json file to reference the correct node IPs for your environment.
+18. Deploy your CNS magic:  
    `cns-deploy -n storage-project -g gluster-topology.json`
-18. Check the status of your new pods however you like:  
+19. Check the status of your new pods however you like:  
    `oc get pod -n storage-project -w`
-19. Set your environment variable to talk to heketi:  
+20. Set your environment variable to talk to heketi:  
    `export HEKETI_CLI_SERVER=http://$(oc get route -n storage-project | grep heketi | awk '{print $2}')`
-20. Check your topology to make sure everything looks pretty:  
+21. Check your topology to make sure everything looks pretty:  
    `heketi-cli topology info`
 
 
