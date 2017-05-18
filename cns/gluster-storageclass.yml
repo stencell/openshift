@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: gluster-dynamic
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: <get from oc get route -n storage-project>
+  restuser: "admin"
+  volumetype: "replicate:3"
+  clusterid: <get from heketi-cli cluster list>
