@@ -23,21 +23,11 @@
 8. Update /etc/ansible/hosts to remove reference to new_nodes. The 3 support nodes should now just be in [node] group.
 9. Add the `rh-gluster-3-for-rhel-7-server-rpms` repo to the bastion host. You can do this by registering with RHN or using a local repo clone in OpenTLC.
 10. *If using subscription-manager*:  
-   subscription-manager repos --disable=* --enable=rh-gluster-3-for-rhel-7-server-rpms
-	
-
-Run oc get node to ensure that the new nodes are added and available. Run any other basic tests on cluster that you deem necessary
-
-Update /etc/ansible/hosts to remove reference to new_nodes. The 3 support nodes should now just be in [nodes] group
-
-On bastion host:
-	register host with RHN
-	-or-
-	get someone in opentlc to reposync the rh-gluster-3-for-rhel-7-server-rpms to make available via repos.d file
-
-	subscription-manager repos --disable=* --enable=rh-gluster-3-for-rhel-7-server-rpms
-
-	yum install cns-deploy heketi-client
+   `subscription-manager repos --disable=* --enable=rh-gluster-3-for-rhel-7-server-rpms`
+11. Install packages:  
+   `yum install cns-deploy heketi-client`
+12. Run the following to create a playbook to update iptables rules on nodes:
+   `
 
 	create and run the following playbook:
 
