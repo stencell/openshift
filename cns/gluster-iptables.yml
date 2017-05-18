@@ -1,0 +1,23 @@
+---
+- name: update iptables
+  hosts: nodes
+  become: true
+  tasks:
+    - name: update iptables
+      lineinfile:
+        insertafter: ^-A OS_FIREWALL
+        regexp: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport {{ item }} -j ACCEPT
+        dest: /etc/sysconfig/iptables
+        line: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport {{ item }} -j ACCEPT
+      with_items:
+        - 24007
+        - 24008
+        - 2222
+
+    - lineinfile:
+        insertafter: ^-A OS_FIREWALL
+        regexp: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+        dest: /etc/sysconfig/iptables
+        line: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
+
+    - shell: systemctl reload iptables
