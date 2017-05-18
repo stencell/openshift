@@ -50,16 +50,29 @@
 22. Create new gluster volume and get pv template output:  
    `heketi-cli volume create --size=7 --persistent-volume-file=gluster-pv.json`
 23. Update the output gluster-pv.json file to point it to the correct endpoints:  
-   >`ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'`
+   `ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'`
 24. Create the new PV:  
    `oc create -f gluster-pv.json`
 25. Label the new PV to better target with PVC:  
    `oc label pv $(oc get pv | grep gluster | awk '{print $1}') storage-tier=gluster`
 26. Make sure PV looks good and includes proper label:  
    ` oc get pv --show-labels`
-27. Download gluster-pvc.yml and reate your PVC in the storage-project project:  
-   `
+27. Download [gluster-pvc.yml](./gluster-pvc.yml) and create your PVC in the storage-project project:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-pvc.yml > /root/gluster-pvc.yml`
    `oc create -f gluster-pvc.yml -n storage-project`
+28. Verify that PV & PVC are created and bound:  
+   `oc get pvc`  
+   `oc get pv`
+29. Download [app.yml](./app.yml) and create your test app:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/app.yml > /root/app.yml`  
+   `oc create -f app.yml`
+30. Access your newly created pod and see the mount at /usr/share/busybox:  
+   `oc rsh busybox`  
+   `df -hT`
+
+*The above steps will make gluster volumes usable within the storage-projects project. If you want to enable this in other projects, you will need to create the gluster endpoints & service in that project*
+
+
 
 
 	optional to do this...i rolled with existing
@@ -71,13 +84,4 @@
 
 
 
-	oc create -f gluster-pvc.yaml
 
-	oc get pv
-	oc get pvc
-
-	oc create -f app.yaml
-
-	oc rsh busybox
-
-	df -hT
