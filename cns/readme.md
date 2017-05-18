@@ -10,10 +10,12 @@
 3. Add label for these nodes 'env=storage'
 4. Clean up storage nodes:
   * Get rid of /etc/fstab entry
-  * Unmount any leftovers with `ansible new_nodes -a 'umount /srv/nfs'`
-  * Get rid of LVM configs with `ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'`
+  * Unmount any leftovers:
+    `ansible new_nodes -a 'umount /srv/nfs'`
+  * Get rid of LVM configs:
+    `ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'`
 5. Prep storage nodes:
-  * `ansible new_nodes -m yum -a 'name=docker'`
+  `ansible new_nodes -m yum -a 'name=docker'`
 6. Run the scaleup playbook to add the new nodes:
   `ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml`
 
