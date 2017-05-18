@@ -14,7 +14,7 @@
     `ansible new_nodes -a 'umount /srv/nfs'`
   * Get rid of LVM configs:  
     `ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'`
-5. Prep storage nodes:  
+5. Prep storage nodes by installing docker:  
    `ansible new_nodes -m yum -a 'name=docker'`
 6. Run the scaleup playbook to add the new nodes:  
    `ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml`
@@ -47,7 +47,19 @@
    `export HEKETI_CLI_SERVER=http://$(oc get route -n storage-project | grep heketi | awk '{print $2}')`
 21. Check your topology to make sure everything looks pretty:  
    `heketi-cli topology info`
-
+22. Create new gluster volume and get pv template output:  
+   `heketi-cli volume create --size=7 --persistent-volume-file=gluster-pv.json`
+23. Update the output gluster-pv.json file to point it to the correct endpoints:  
+   `ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'`
+24. Create the new PV:  
+   `oc create -f gluster-pv.json`
+25. Label the new PV to better target with PVC:  
+   `oc label pv $(oc get pv | grep gluster | awk '{print $1}') storage-tier=gluster`
+26. Make sure PV looks good and includes proper label:  
+   ` oc get pv --show-labels`
+27. Download gluster-pvc.yml and reate your PVC in the storage-project project:  
+   `
+   `oc create -f gluster-pvc.yml -n storage-project`
 
 
 	optional to do this...i rolled with existing
@@ -55,15 +67,9 @@
 		oc create -f gluster-endpoints.yaml
 		oc create -f gluster-service.yamml
 
-	heketi-cli volume create --size=7 --persistent-volume-file=gluster-pv.json
 
-	ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'
 
-	oc create -f gluster-pv.json
 
-	oc label pv $(oc get pv | grep gluster | awk '{print $1}') storage-tier=gluster
-
-	oc get pv --show-labels
 
 	oc create -f gluster-pvc.yaml
 
