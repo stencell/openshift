@@ -50,7 +50,7 @@
 22. Create new gluster volume and get pv template output:  
    `heketi-cli volume create --size=7 --persistent-volume-file=gluster-pv.json`
 23. Update the output gluster-pv.json file to point it to the correct endpoints:  
-   `ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'`
+   >`ansible localhost -m replace -a 'dest=/root/gluster-pv.json regexp="TYPE ENDPOINT HERE" replace=heketi-storage-endpoints'`
 24. Create the new PV:  
    `oc create -f gluster-pv.json`
 25. Label the new PV to better target with PVC:  
