@@ -10,15 +10,20 @@
 3. Add label for these nodes 'env=storage'
 4. Clean up storage nodes:
   * Get rid of /etc/fstab entry
-  * Unmount any leftovers:
+  * Unmount any leftovers:  
     `ansible new_nodes -a 'umount /srv/nfs'`
-  * Get rid of LVM configs:
+  * Get rid of LVM configs:  
     `ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'`
 5. Prep storage nodes:  
    `ansible new_nodes -m yum -a 'name=docker'`
 6. Run the scaleup playbook to add the new nodes:  
    `ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml`
-
+7. Check the status of your new nodes and any other health checks you want to run:  
+   `oc get nodes`
+8. Update /etc/ansible/hosts to remove reference to new_nodes. The 3 support nodes should now just be in [node] group.
+9. Add the `rh-gluster-3-for-rhel-7-server-rpms` repo to the bastion host. You can do this by registering with RHN or using a local repo clone in OpenTLC.
+10. *If using subscription-manager*:  
+   subscription-manager repos --disable=* --enable=rh-gluster-3-for-rhel-7-server-rpms
 	
 
 Run oc get node to ensure that the new nodes are added and available. Run any other basic tests on cluster that you deem necessary
