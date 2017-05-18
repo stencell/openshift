@@ -27,7 +27,7 @@
 11. Install packages:  
    `yum install cns-deploy heketi-client`
 12. Copy the [gluster-iptables.yml](./gluster-iptables.yml) playbook to your host and run it:  
-   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-iptables.yml > /root/gluster-iptables.yml` . 
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-iptables.yml > /root/gluster-iptables.yml`  
    `ansible-playbook gluster-iptables.yml`
 
 
