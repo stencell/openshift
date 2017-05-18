@@ -26,34 +26,10 @@
    `subscription-manager repos --disable=* --enable=rh-gluster-3-for-rhel-7-server-rpms`
 11. Install packages:  
    `yum install cns-deploy heketi-client`
-12. Run the following to create a playbook to update iptables rules on nodes:
-   `
+12. Copy the [gluster-iptables.yml](./gluster-iptables.yml) playbook to your host and run it:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-iptables.yml > /root/gluster-iptables.yml` . 
+   `ansible-playbook gluster-iptables.yml`
 
-	create and run the following playbook:
-
-		---
-		- name: update iptables
-		  hosts: nodes
-		  become: true
-		  tasks:
-		    - name: update iptables
-		      lineinfile:
-		        insertafter: ^-A OS_FIREWALL
-		        regexp: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport {{ item }} -j ACCEPT
-		        dest: /etc/sysconfig/iptables
-		        line: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport {{ item }} -j ACCEPT
-		      with_items:
-		        - 24007
-		        - 24008
-		        - 2222
-
-		    - lineinfile:
-		        insertafter: ^-A OS_FIREWALL
-		        regexp: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-		        dest: /etc/sysconfig/iptables
-		        line: -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m multiport --dports 49152:49664 -j ACCEPT
-
-		    - shell: systemctl reload iptables
 
 	Check to make sure dm_thin_pool module is loaded (this should already be done)
 		ansible nodes -m shell -a 'lsmod | grep dm_thin_pool'
