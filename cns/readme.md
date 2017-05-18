@@ -5,6 +5,7 @@
 
 *Unless specified, the steps should all be run from the bastion server or whatever server has your /etc/ansible/hosts file.*
 
+#### Basic Setup
 1. Add new_nodes under [OSEv3:children] group in /etc/ansible/hosts
 2. Add 3 support nodes to [new_nodes] group in /etc/ansible/hosts
 3. Add label for these nodes 'env=storage'
@@ -36,6 +37,8 @@
 15. Add a couple of users to privileged SCC:  
    `oadm policy add-scc-to-user privileged -z storage-project`  
    `oadm policy add-scc-to-user privileged -z default`
+
+#### Gluster/CNS deploy
 16. Copy the [gluster-topology.json](./gluster-topology.json) file to your host:  
    `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-topology.json > /root/gluster-topology.json`
 17. Update the gluster-topology.json file to reference the correct node IPs for your environment.
@@ -47,6 +50,8 @@
    `export HEKETI_CLI_SERVER=http://$(oc get route -n storage-project | grep heketi | awk '{print $2}')`
 21. Check your topology to make sure everything looks pretty:  
    `heketi-cli topology info`
+
+#### Create PV/PVC & Test Pod
 22. Create new gluster volume and get pv template output:  
    `heketi-cli volume create --size=7 --persistent-volume-file=gluster-pv.json`
 23. Update the output gluster-pv.json file to point it to the correct endpoints:  
@@ -70,15 +75,23 @@
    `oc rsh busybox`  
    `df -hT`
 
-*The above steps will make gluster volumes usable within the storage-projects project. If you want to enable this in other projects, you will need to create the gluster endpoints & service in that project*
+*The above steps will make gluster volumes usable within the storage-projects project. If you want to enable this in other projects, you will need to create the gluster endpoints & service in that project. See the example *.yml files in this repo.*
 
-
-
-
-	optional to do this...i rolled with existing
-	create endpoints & svc:
-		oc create -f gluster-endpoints.yaml
-		oc create -f gluster-service.yamml
+#### Create dynamic storage
+1. Download [gluster-storageclass.yml](./gluster-storageclass.yml), modify it, and create in OpenShift:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-storageclass.yml > /root/gluster-storageclass.yml`  
+   `vi gluster-storageclass.yml`  
+   `oc create -f gluster-storageclass.yml`
+2. Download [gluster-pvc-dynamic.yml](./gluster-pvc-dynamic.yml) and create:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-pvc-dynamic.yml > /root/gluster-pvc-dynamic.yml`  
+   `oc create -f gluster-pvc-dynamic.yml`
+3. Make sure you have new PV, PVC, endpoint, and service:  
+   `oc get pv,pvc,endpoints,svc`
+4. Spin up a new app and test:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/app-dynamic.yml > /root/app-dynamic.yml`  
+   `oc create -f app-dynamic.yml`  
+   `oc rsh busybox-dynamic`  
+   `df -hT`
 
 
 
