@@ -1,18 +1,24 @@
-CNS steps:
 
-Clean up storage nodes:
-  Get rid of /etc/fstab entry
-  ansible new_nodes -a 'umount /srv/nfs'
-  ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'
+# CNS Setup
 
-Prep storage nodes:
-  ansible new_nodes -m yum -a 'name=docker'
+### This is meant to be run in the OpenShift advanced training lab, but you can use these steps more generally in any OpenShift environment.
 
-Add new_nodes under [OSEv3:children] group
+*Unless specified, the steps should all be run from the bastion server or whatever server has your /etc/ansible/hosts file.
 
-Add 3 support nodes to [new_nodes] group in ansible hosts file
+1. Add new_nodes under [OSEv3:children] group in /etc/ansible/hosts
+2. Add 3 support nodes to [new_nodes] group in /etc/ansible/hosts
+3. Add label for these nodes 'env=storage'
+4. Clean up storage nodes:
+  *Get rid of /etc/fstab entry
+  *ansible new_nodes -a 'umount /srv/nfs'
+  *ansible new_nodes -m shell -a 'lvremove -f /dev/nfsvg/nfsmount;vgremove -f nfsvg;pvremove -f /dev/xvdb'
 
-Add label for these nodes 'env=storage'
+5. Prep storage nodes:
+  *ansible new_nodes -m yum -a 'name=docker'
+
+
+
+
 
 Run the scaleup playbook:
 	/usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
