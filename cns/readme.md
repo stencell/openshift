@@ -1,7 +1,7 @@
 
 # CNS Setup
 
-### This is meant to be run in the OpenShift advanced training lab, but you can use these steps more generally in any OpenShift environment.
+### This is meant to be run in the OpenShift advanced training lab, but you can use these steps more generally in any OpenShift environment. This assumes you have already deployed your initial OpenShift cluster.
 
 *Unless specified, the steps should all be run from the bastion server or whatever server has your /etc/ansible/hosts file.*
 
