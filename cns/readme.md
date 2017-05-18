@@ -29,25 +29,25 @@
 12. Copy the [gluster-iptables.yml](./gluster-iptables.yml) playbook to your host and run it:  
    `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-iptables.yml > /root/gluster-iptables.yml`  
    `ansible-playbook gluster-iptables.yml`
+13. Check to make sure dm_thin_pool module is loaded:  
+   `ansible nodes -m shell -a 'lsmod | grep dm_thin_pool'`
+14. Create a new project for Gluster:  
+   `oc new-project storage-project`
+15. Add a couple of users to privileged SCC:  
+   `oadm policy add-scc-to-user privileged -z storage-project`  
+   `oadm policy add-scc-to-user privileged -z default`
+16. Copy the [gluster-topology.json](./gluster-topology.json) file to your host:  
+   `curl https://raw.githubusercontent.com/stencell/openshift/master/cns/gluster-topology.json > /root/gluster-topology.json`
+17. Deploy your CNS magic:  
+   `cns-deploy -n storage-project -g gluster-topology.json`
+18. Check the status of your new pods however you like:  
+   `oc get pod -n storage-project -w`
+19. Set your environment variable to talk to heketi:  
+   `export HEKETI_CLI_SERVER=http://$(oc get route -n storage-project | grep heketi | awk '{print $2}')`
+20. Check your topology to make sure everything looks pretty:  
+   `heketi-cli topology info`
 
 
-	Check to make sure dm_thin_pool module is loaded (this should already be done)
-		ansible nodes -m shell -a 'lsmod | grep dm_thin_pool'
-
-	oc new-project storage-project
-
-	oadm policy add-scc-to-user privileged -z storage-project
-	oadm policy add-scc-to-user privileged -z default
-
-	Create a topology file for gluster. see example file
-
-	cns-deploy -n storage-project -g gluster-topology.json
-
-	oc get pod -n storage-project -w to observe status
-
-	export HEKETI_CLI_SERVER=http://$(oc get route -n storage-project | grep heketi | awk '{print $2}')
-
-	heketi-cli topology info
 
 	optional to do this...i rolled with existing
 	create endpoints & svc:
